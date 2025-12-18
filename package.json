@@ -1,0 +1,81 @@
+{
+  "name": "vscode-code-fader",
+  "publisher": "char8x",
+  "displayName": "Code Fader",
+  "description": "Code Fader",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "id": "basicConfig",
+      "title": "Code Fader",
+      "type": "object",
+      "properties": {
+        "codeFader.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Code Fader"
+        },
+        "codeFader.decoration": {
+          "type": "object",
+          "description": "Rendering styles for irrelevant code",
+          "default": {
+            "opacity": "0.2",
+            "backgroundColor": "transparent",
+            "border": "none"
+          }
+        },
+        "codeFader.autoUnfold": {
+          "type": "boolean",
+          "description": "Auto unfold code block",
+          "default": true
+        }
+      }
+    }
+  },
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:go",
+    "onLanguage:python"
+  ],
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
+    "prewatch": "rimraf out dist",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "pnpm run check-types && pnpm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "node ./out/test/runTest.js",
+    "bundle": "vsce package"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.100.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.27.0",
+    "eslint": "^9.39.1",
+    "glob": "10.5.0",
+    "mocha": "11.7.5",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "5.0.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3"
+  }
+}
