@@ -1,3 +1,7 @@
 {
-  "editor.selectionHighlight": true
+  "editor.selectionHighlight": true,
+  "codeFader.enabled": true,
+  "workbench.colorCustomizations": {
+    "editor.selectionHighlightBorder": "default"
+  }
 }

@@ -144,31 +144,59 @@ async function calculateRanges(
   );
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+function loadSettings() {
   const config = vscode.workspace.getConfiguration();
-  let isEnabled = config.get<boolean>('codeFader.enabled');
-  const isAutoUnfold = config.get<boolean>('codeFader.autoUnfold');
+
   const decorationSetting = Object.assign(
     {
       opacity: '0.2',
       backgroundColor: 'transparent',
-      border: 'none',
     } as vscode.ThemableDecorationRenderOptions,
     config.get<vscode.ThemableDecorationRenderOptions>('codeFader.decoration')
   );
   let codeDecoration =
     vscode.window.createTextEditorDecorationType(decorationSetting);
 
+  let isEnabled = config.get<boolean>('codeFader.enabled');
+  const isAutoUnfold = config.get<boolean>('codeFader.autoUnfold');
+
+  return { isEnabled, codeDecoration, isAutoUnfold };
+}
+
+function subscribeSelectionHighlightBorderChange(
+  context: vscode.ExtensionContext
+) {
+  let isPromptVisible = false;
+
+  async function showReloadPrompt() {
+    if (isPromptVisible) return;
+
+    isPromptVisible = true;
+    const selection = await vscode.window.showInformationMessage(
+      'Configuration changes have been detected. Reload now?',
+      'Reload'
+    );
+    isPromptVisible = false;
+
+    if (selection === 'Reload') {
+      vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
+  }
+
+  // Listen for Configuration Change Events
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
       if (event.affectsConfiguration('codeFader.enabled')) {
-        const updatedValue = vscode.workspace
-          .getConfiguration()
-          .get<boolean>('codeFader.enabled');
-        isEnabled = updatedValue;
+        showReloadPrompt();
       }
     })
   );
+}
+
+export async function activate(context: vscode.ExtensionContext) {
+  subscribeSelectionHighlightBorderChange(context);
+
+  let { isEnabled, codeDecoration, isAutoUnfold } = loadSettings();
 
   let selectionVersion = 0;
 

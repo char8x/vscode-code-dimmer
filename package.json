@@ -27,8 +27,7 @@
           "description": "Rendering styles for irrelevant code",
           "default": {
             "opacity": "0.2",
-            "backgroundColor": "transparent",
-            "border": "none"
+            "backgroundColor": "transparent"
           }
         },
         "codeFader.autoUnfold": {
