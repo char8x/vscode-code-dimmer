@@ -144,20 +144,48 @@ async function calculateRanges(
   );
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+function loadSettings() {
   const config = vscode.workspace.getConfiguration();
-  let isEnabled = config.get<boolean>('codeFader.enabled');
-  const isAutoUnfold = config.get<boolean>('codeFader.autoUnfold');
+
+  const isSelectionHighlightBorderDisabled = config.get<boolean>(
+    'codeFader.disableSelectionHighlightBorder'
+  );
+
+  if (isSelectionHighlightBorderDisabled) {
+    // Get current custom color settings
+    const currentColorCustomizations =
+      config.get('workbench.colorCustomizations') || {};
+
+    const newCustomizations = {
+      ...currentColorCustomizations,
+      'editor.selectionHighlightBorder': 'default',
+    };
+
+    config.update(
+      'workbench.colorCustomizations',
+      newCustomizations,
+      vscode.ConfigurationTarget.Global
+    );
+  }
+
   const decorationSetting = Object.assign(
     {
       opacity: '0.2',
       backgroundColor: 'transparent',
-      border: 'none',
     } as vscode.ThemableDecorationRenderOptions,
     config.get<vscode.ThemableDecorationRenderOptions>('codeFader.decoration')
   );
   let codeDecoration =
     vscode.window.createTextEditorDecorationType(decorationSetting);
+
+  let isEnabled = config.get<boolean>('codeFader.enabled');
+  const isAutoUnfold = config.get<boolean>('codeFader.autoUnfold');
+
+  return { isEnabled, codeDecoration, isAutoUnfold };
+}
+
+export async function activate(context: vscode.ExtensionContext) {
+  let { isEnabled, codeDecoration, isAutoUnfold } = loadSettings();
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {

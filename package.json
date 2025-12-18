@@ -27,9 +27,13 @@
           "description": "Rendering styles for irrelevant code",
           "default": {
             "opacity": "0.2",
-            "backgroundColor": "transparent",
-            "border": "none"
+            "backgroundColor": "transparent"
           }
+        },
+        "codeFader.disableSelectionHighlightBorder": {
+          "type": "boolean",
+          "description": "Disable the style for selectionHighlightBorder",
+          "default": true
         },
         "codeFader.autoUnfold": {
           "type": "boolean",

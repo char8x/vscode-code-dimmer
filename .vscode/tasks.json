@@ -107,7 +107,7 @@
             "id": "terminateAll",
             "type": "command",
             "command": "workbench.action.tasks.terminate",
-            "args": "terminateAll" // 终止所有运行任务；如果只想终止特定任务，可手动选择
+            "args": "terminateAll"
         }
     ]
 }
