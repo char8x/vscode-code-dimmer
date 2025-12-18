@@ -147,27 +147,6 @@ async function calculateRanges(
 function loadSettings() {
   const config = vscode.workspace.getConfiguration();
 
-  const isSelectionHighlightBorderDisabled = config.get<boolean>(
-    'codeFader.disableSelectionHighlightBorder'
-  );
-
-  if (isSelectionHighlightBorderDisabled) {
-    // Get current custom color settings
-    const currentColorCustomizations =
-      config.get('workbench.colorCustomizations') || {};
-
-    const newCustomizations = {
-      ...currentColorCustomizations,
-      'editor.selectionHighlightBorder': 'default',
-    };
-
-    config.update(
-      'workbench.colorCustomizations',
-      newCustomizations,
-      vscode.ConfigurationTarget.Global
-    );
-  }
-
   const decorationSetting = Object.assign(
     {
       opacity: '0.2',
@@ -184,19 +163,45 @@ function loadSettings() {
   return { isEnabled, codeDecoration, isAutoUnfold };
 }
 
-export async function activate(context: vscode.ExtensionContext) {
-  let { isEnabled, codeDecoration, isAutoUnfold } = loadSettings();
+function subscribeSelectionHighlightBorderChange(
+  context: vscode.ExtensionContext
+) {
+  let isPromptVisible = false;
 
+  async function showReloadPrompt() {
+    if (isPromptVisible) return;
+
+    isPromptVisible = true;
+    const selection = await vscode.window.showInformationMessage(
+      'Configuration changes have been detected. Reload now?',
+      'Reload'
+    );
+    isPromptVisible = false;
+
+    if (selection === 'Reload') {
+      vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
+  }
+
+  // Listen for Configuration Change Events
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration('codeFader.enabled')) {
-        const updatedValue = vscode.workspace
-          .getConfiguration()
-          .get<boolean>('codeFader.enabled');
-        isEnabled = updatedValue;
+      if (
+        event.affectsConfiguration(
+          'codeFader.disableSelectionHighlightBorder'
+        ) ||
+        event.affectsConfiguration('codeFader.enabled')
+      ) {
+        showReloadPrompt();
       }
     })
   );
+}
+
+export async function activate(context: vscode.ExtensionContext) {
+  subscribeSelectionHighlightBorderChange(context);
+
+  let { isEnabled, codeDecoration, isAutoUnfold } = loadSettings();
 
   let selectionVersion = 0;
 

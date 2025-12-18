@@ -30,11 +30,6 @@
             "backgroundColor": "transparent"
           }
         },
-        "codeFader.disableSelectionHighlightBorder": {
-          "type": "boolean",
-          "description": "Disable the style for selectionHighlightBorder",
-          "default": true
-        },
         "codeFader.autoUnfold": {
           "type": "boolean",
           "description": "Auto unfold code block",
