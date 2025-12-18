@@ -186,12 +186,7 @@ function subscribeSelectionHighlightBorderChange(
   // Listen for Configuration Change Events
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (
-        event.affectsConfiguration(
-          'codeFader.disableSelectionHighlightBorder'
-        ) ||
-        event.affectsConfiguration('codeFader.enabled')
-      ) {
+      if (event.affectsConfiguration('codeFader.enabled')) {
         showReloadPrompt();
       }
     })
