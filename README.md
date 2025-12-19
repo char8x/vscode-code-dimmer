@@ -28,6 +28,13 @@ Double-clicking a variable name will highlight all its usages.
 
 ## Troubleshooting
 
+### Double-clicking the Variable Name Has No Effect
+
+This can occur in the following situations:
+
+- The variable is not referenced elsewhere and only appears at the current location.
+- The corresponding Language Server for the code has not been enabled.
+
 ### Selection Highlight Border Visual Disturbance
 
 Sometimes, the ColorTheme includes styling for `editor.selectionHighlightBorder`. Due to the limitations of the APIs within VS Code Extension, this specific item cannot be overridden, it can only be addressed by customizing configuration settings.
@@ -44,7 +51,8 @@ You can resolve this by adding the following code to `.vscode/settings.json`:
 
 ## Limitations
 
-Achieving finer-grained highlighting depends on improvements in the capabilities of the Language Server, specifically its ability to track variable ranges down to the column level.
+- This extension relies on code range results provided by the Language Server, support levels vary slightly among different Language Servers compared to the built-in `JavaScript/TypeScript` support.
+- Achieving finer-grained highlighting depends on improvements in the capabilities of the Language Server, specifically its ability to track variable ranges down to the column level.
 
 ## Credits
 
