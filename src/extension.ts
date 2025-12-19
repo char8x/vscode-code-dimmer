@@ -169,7 +169,7 @@ function subscribeSelectionHighlightBorderChange(
   let isPromptVisible = false;
 
   async function showReloadPrompt() {
-    if (isPromptVisible) return;
+    if (isPromptVisible) {return;}
 
     isPromptVisible = true;
     const selection = await vscode.window.showInformationMessage(

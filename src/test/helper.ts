@@ -11,7 +11,7 @@ export let platformEol: string;
  */
 export async function activate(docUri: vscode.Uri) {
   // The extensionId is `publisher.name` from package.json
-  const ext = vscode.extensions.getExtension('char8x.vscode-code-fader');
+  const ext = vscode.extensions.getExtension('char8x.vscode-code-dimmer');
   await ext?.activate();
   try {
     doc = await vscode.workspace.openTextDocument(docUri);
@@ -23,7 +23,7 @@ export async function activate(docUri: vscode.Uri) {
 }
 
 async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export const getDocPath = (p: string) => {
@@ -38,5 +38,5 @@ export async function setTestContent(content: string): Promise<boolean> {
     doc.positionAt(0),
     doc.positionAt(doc.getText().length)
   );
-  return editor.edit(eb => eb.replace(all, content));
+  return editor.edit((eb) => eb.replace(all, content));
 }
