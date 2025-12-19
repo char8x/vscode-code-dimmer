@@ -1,8 +1,8 @@
 {
-  "name": "vscode-code-fader",
+  "name": "vscode-code-dimmer",
   "publisher": "char8x",
-  "displayName": "Code Fader",
-  "description": "Code Fader",
+  "displayName": "Code Dimmer",
+  "description": "Code Dimmer",
   "version": "0.1.0",
   "engines": {
     "vscode": "^1.100.0"
@@ -14,13 +14,13 @@
   "contributes": {
     "configuration": {
       "id": "basicConfig",
-      "title": "Code Fader",
+      "title": "Code Dimmer",
       "type": "object",
       "properties": {
         "codeFader.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable Code Fader"
+          "description": "Enable Code Dimmer"
         },
         "codeFader.decoration": {
           "type": "object",
