@@ -3,7 +3,7 @@
   "publisher": "char8x",
   "displayName": "Code Dimmer - Highlight Variables Hide Others",
   "description": "Highlight the scope and citation locations of variables, reduce the opacity of code blocks unrelated to the variables",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.100.0"
