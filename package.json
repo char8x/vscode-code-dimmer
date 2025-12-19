@@ -1,15 +1,30 @@
 {
   "name": "vscode-code-dimmer",
   "publisher": "char8x",
-  "displayName": "Code Dimmer",
-  "description": "Code Dimmer",
+  "displayName": "Code Dimmer - Highlight Variables Hide Others",
+  "description": "Highlight the scope and citation locations of variables, reduce the opacity of code blocks unrelated to the variables",
   "version": "0.1.0",
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.100.0"
   },
   "categories": [
+    "Visualization",
     "Other"
   ],
+  "keywords": [
+    "highlight",
+    "scope"
+  ],
+  "homepage": "https://github.com/char8x/vscode-code-dimmer/blob/main/README.md",
+  "bugs": {
+    "url": "https://github.com/char8x/vscode-code-dimmer/issues",
+    "email": "char8x@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/char8x/vscode-code-dimmer.git"
+  },
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -43,7 +58,6 @@
     "onLanguage:typescriptreact",
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
-    "onLanguage:go",
     "onLanguage:python"
   ],
   "scripts": {
