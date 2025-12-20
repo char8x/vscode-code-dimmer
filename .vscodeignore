@@ -15,3 +15,8 @@ vsc-extension-quickstart.md
 pnpm-lock.yaml
 pnpm-workspace.yaml
 media/**
+test-fixture/**
+.github/**
+justfile
+.npmrc
+*.vsix

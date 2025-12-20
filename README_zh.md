@@ -1,4 +1,8 @@
-# Code Dimmer
+# Code Dimmer - Highlight Variables Hide Others
+
+[![Download](https://img.shields.io/visual-studio-marketplace/d/char8x.vscode-code-dimmer)](https://marketplace.visualstudio.com/items?itemName=char8x.vscode-code-dimmer)
+[![Download VSIX](https://img.shields.io/badge/Download-VSIX-blue?logo=visualstudiocode)](https://github.com/char8x/vscode-code-dimmer/releases/latest)
+![Version](https://img.shields.io/visual-studio-marketplace/v/char8x.vscode-code-dimmer)
 
 本插件是一款通过降低无关代码透明度，帮助用户在阅读时集中注意力的工具
 

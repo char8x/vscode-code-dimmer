@@ -2,7 +2,11 @@
 English | <a href="https://github.com/char8x/vscode-code-dimmer/blob/main/README_zh.md" target="_blank">简体中文</a>
 </sub></div>
 
-# Code Dimmer
+# Code Dimmer - Highlight Variables Hide Others
+
+[![Download](https://img.shields.io/visual-studio-marketplace/d/char8x.vscode-code-dimmer)](https://marketplace.visualstudio.com/items?itemName=char8x.vscode-code-dimmer)
+[![Download VSIX](https://img.shields.io/badge/Download-VSIX-blue?logo=visualstudiocode)](https://github.com/char8x/vscode-code-dimmer/releases/latest)
+![Version](https://img.shields.io/visual-studio-marketplace/v/char8x.vscode-code-dimmer)
 
 This extension is a tool that focuses user attention by reducing the opacity of irrelevant code while reading through it.
 
