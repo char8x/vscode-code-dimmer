@@ -169,7 +169,7 @@ function subscribeSelectionHighlightBorderChange(
   let isPromptVisible = false;
 
   async function showReloadPrompt() {
-    if (isPromptVisible) {return;}
+    if (isPromptVisible) { return; }
 
     isPromptVisible = true;
     const selection = await vscode.window.showInformationMessage(
@@ -208,6 +208,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Respond only to mouse selection events, ignoring keyboard selection
     if (event.kind !== vscode.TextEditorSelectionChangeKind.Mouse) {
+      if (event.selections.length === 1 && event.selections[0].isEmpty) {
+        // When the selection area becomes empty (which usually happens when pressing Esc to cancel multiple selections or deselecting items)
+        event.textEditor.setDecorations(codeDecoration, []);
+      }
       return;
     }
 
@@ -241,4 +245,4 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 }
 
-export function deactivate() {}
+export function deactivate() { }
