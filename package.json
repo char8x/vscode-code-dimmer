@@ -74,6 +74,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint --fix src",
     "test": "node ./out/test/runTest.js",
+    "vitest": "vitest",
     "bundle": "vsce package"
   },
   "devDependencies": {
@@ -89,6 +90,7 @@
     "npm-run-all": "^4.1.5",
     "rimraf": "5.0.10",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.3"
+    "typescript-eslint": "^8.46.3",
+    "vitest": "4.0.18"
   }
 }
