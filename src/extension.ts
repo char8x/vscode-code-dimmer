@@ -1,100 +1,22 @@
 import * as vscode from 'vscode';
+import { SymbolStore } from './lib/storage.js';
+import { SymbolManager } from './lib/symbols.js';
+import { getLinesByRanges, getNonSelectedRanges } from './lib/ranges.js';
+import { isVariableSelection, getReadOrWriteHighlights } from './lib/editor.js';
 import {
-  buildSymbolMap,
-  saveFileMtime,
-  loadFileMtime,
-  saveSymbolData,
-  loadSymbolData,
-  getFileStat,
-  getNonSelectedRanges,
-} from './util.js';
-
-function isVariableSelection(editor: vscode.TextEditor): boolean {
-  const selection = editor.selection;
-  if (!selection || selection.isEmpty) {
-    return false;
-  }
-
-  if (selection.start.line !== selection.end.line) {
-    return false;
-  }
-
-  const document = editor.document;
-  const wordAtPosition = document.getWordRangeAtPosition(selection.start);
-
-  if (!wordAtPosition) {
-    return false;
-  }
-
-  // Check if the selection exactly matches word boundaries
-  return (
-    selection.start.character === wordAtPosition.start.character &&
-    selection.end.character === wordAtPosition.end.character
-  );
-}
-
-function getLinesByRanges(ranges: vscode.Range[]): Array<[number, number]> {
-  return ranges.reduce<Array<[number, number]>>((cur, acc) => {
-    cur.push([acc.start.line, acc.end.line]);
-    return cur;
-  }, []);
-}
-
-async function loadSymbolMap(
-  context: vscode.ExtensionContext,
-  document: vscode.TextDocument
-): Promise<Map<string, vscode.DocumentSymbol[]>> {
-  const documentURI = document.uri;
-  let symbolsMap = new Map<string, vscode.DocumentSymbol[]>();
-  if (
-    (await getFileStat(documentURI)) !== loadFileMtime(context, documentURI)
-  ) {
-    // Get all symbols in the current document
-    const symbols = await vscode.commands.executeCommand<
-      vscode.DocumentSymbol[]
-    >('vscode.executeDocumentSymbolProvider', documentURI);
-    if (Array.isArray(symbols) && symbols.length !== 0) {
-      buildSymbolMap(symbolsMap, symbols, document.languageId);
-      await saveSymbolData(context, documentURI, symbolsMap);
-    }
-    await saveFileMtime(
-      context,
-      documentURI,
-      (await getFileStat(documentURI)) || 0
-    );
-  } else {
-    symbolsMap = loadSymbolData(context, documentURI);
-  }
-
-  return symbolsMap;
-}
-
-async function getReadOrWriteHighlights(editor: vscode.TextEditor) {
-  // All highlighted locations within the scope of the current document
-  const highlights = await vscode.commands.executeCommand<
-    vscode.DocumentHighlight[]
-  >(
-    'vscode.executeDocumentHighlights',
-    editor.document.uri,
-    editor.selection.start
-  );
-
-  return highlights.filter(
-    (h) =>
-      h.kind === vscode.DocumentHighlightKind.Read ||
-      h.kind === vscode.DocumentHighlightKind.Write
-  );
-}
+  loadSettings,
+  subscribeSelectionHighlightBorderChange,
+} from './lib/config.js';
 
 /**
  * Calculate Decoration Range
  *
- * @param context
+ * @param symbolManager
  * @param editor
  * @returns
  */
 async function calculateRanges(
-  context: vscode.ExtensionContext,
+  symbolManager: SymbolManager,
   editor: vscode.TextEditor
 ): Promise<{
   nonSelectedRanges: vscode.Range[];
@@ -102,7 +24,7 @@ async function calculateRanges(
 }> {
   const selectionText = editor.document.getText(editor.selection);
 
-  let symbolsMap = await loadSymbolMap(context, editor.document);
+  const symbolsMap = await symbolManager.loadSymbolMap(editor.document);
   const highlights = await getReadOrWriteHighlights(editor);
 
   if (symbolsMap && symbolsMap.has(selectionText)) {
@@ -144,59 +66,29 @@ async function calculateRanges(
   );
 }
 
-function loadSettings() {
-  const config = vscode.workspace.getConfiguration();
-
-  const decorationSetting = Object.assign(
-    {
-      opacity: '0.2',
-      backgroundColor: 'transparent',
-    } as vscode.ThemableDecorationRenderOptions,
-    config.get<vscode.ThemableDecorationRenderOptions>('codeFader.decoration')
-  );
-  let codeDecoration =
-    vscode.window.createTextEditorDecorationType(decorationSetting);
-
-  let isEnabled = config.get<boolean>('codeFader.enabled');
-  const isAutoUnfold = config.get<boolean>('codeFader.autoUnfold');
-
-  return { isEnabled, codeDecoration, isAutoUnfold };
-}
-
-function subscribeSelectionHighlightBorderChange(
-  context: vscode.ExtensionContext
-) {
-  let isPromptVisible = false;
-
-  async function showReloadPrompt() {
-    if (isPromptVisible) { return; }
-
-    isPromptVisible = true;
-    const selection = await vscode.window.showInformationMessage(
-      'Configuration changes have been detected. Reload now?',
-      'Reload'
-    );
-    isPromptVisible = false;
-
-    if (selection === 'Reload') {
-      vscode.commands.executeCommand('workbench.action.reloadWindow');
-    }
-  }
-
-  // Listen for Configuration Change Events
-  context.subscriptions.push(
-    vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration('codeFader.enabled')) {
-        showReloadPrompt();
-      }
-    })
-  );
-}
-
 export async function activate(context: vscode.ExtensionContext) {
+  const symbolStore = new SymbolStore(context);
+  const symbolManager = new SymbolManager(symbolStore);
+
   subscribeSelectionHighlightBorderChange(context);
 
   let { isEnabled, codeDecoration, isAutoUnfold } = loadSettings();
+
+  // Re-load settings when configuration changes
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (
+        e.affectsConfiguration('codeFader.decoration') ||
+        e.affectsConfiguration('codeFader.enabled') ||
+        e.affectsConfiguration('codeFader.autoUnfold')
+      ) {
+        const settings = loadSettings();
+        isEnabled = settings.isEnabled;
+        codeDecoration = settings.codeDecoration;
+        isAutoUnfold = settings.isAutoUnfold;
+      }
+    })
+  );
 
   let selectionVersion = 0;
 
@@ -223,7 +115,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const newVersion = ++selectionVersion;
     const editor = event.textEditor;
     const { nonSelectedRanges, selectedLines } = await calculateRanges(
-      context,
+      symbolManager,
       editor
     );
 
@@ -234,15 +126,15 @@ export async function activate(context: vscode.ExtensionContext) {
     editor.setDecorations(codeDecoration, nonSelectedRanges);
 
     if (isAutoUnfold && selectedLines.length > 0) {
-      selectedLines.forEach(async (line) => {
+      for (const line of selectedLines) {
         await vscode.commands.executeCommand('editor.unfold', {
           levels: 1,
           direction: 'up',
           selectionLines: line,
         });
-      });
+      }
     }
   });
 }
 
-export function deactivate() { }
+export function deactivate() {}
