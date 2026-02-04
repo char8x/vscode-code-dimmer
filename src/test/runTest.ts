@@ -9,10 +9,20 @@ async function main() {
     const extensionDevelopmentPath = path.resolve(__dirname, '../../');
     // The path to the extension test runner script
     // Passed to --extensionTestsPath
-    const extensionTestsPath = path.resolve(__dirname, './index');
+    const extensionTestsPath = path.resolve(__dirname, './ingegration/index');
 
     // Download VS Code, unzip it and run the integration test
-    await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: ['--disable-extensions'] });
+    await runTests({
+      version: '1.90.2',
+      extensionDevelopmentPath,
+      extensionTestsPath,
+      launchArgs: [
+        '--disable-extensions',
+        '--disable-telemetry',
+        '--disable-updates',
+        '--disable-crash-reporter',
+      ],
+    });
   } catch (err) {
     console.error(err);
     console.error('Failed to run tests');
