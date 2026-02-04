@@ -6,8 +6,12 @@ export class Position {
     public character: number
   ) {}
   isBefore(other: Position): boolean {
-    if (this.line < other.line) {return true;}
-    if (this.line > other.line) {return false;}
+    if (this.line < other.line) {
+      return true;
+    }
+    if (this.line > other.line) {
+      return false;
+    }
     return this.character < other.character;
   }
 }
@@ -34,11 +38,21 @@ export class Range {
   }
 }
 
+export enum TextEditorSelectionChangeKind {
+  Keyboard = 1,
+  Mouse = 2,
+  Command = 3,
+}
+
 export const vscode = {
   Position,
   Range,
+  TextEditorSelectionChangeKind,
   window: {
     activeTextEditor: undefined,
+  },
+  commands: {
+    executeCommand: vi.fn(),
   },
 };
 

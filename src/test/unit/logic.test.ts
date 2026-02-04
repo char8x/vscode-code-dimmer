@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import './mocks/vscode';
 import * as vscode from 'vscode';
 import { calculateRanges } from '../../lib/logic';
-import { SymbolManager } from '../../lib/symbols';
 import * as editorUtils from '../../lib/editor';
 
 // Mock dependencies
@@ -47,9 +46,9 @@ describe('calculateRanges logic', () => {
     expect(result.selectedLines).toEqual([]);
   });
 
-  it('should use symbol range when selection matches a symbol exactly (Case 1)', async () => {
+  it('should use symbol declaration range when selection matches a symbol exactly (Case 1)', async () => {
     const selectionRange = new vscode.Range(1, 5, 1, 10);
-    const symbolRange = new vscode.Range(0, 0, 5, 0); // Symbol spans multiple lines
+    const symbolDeclarationRange = new vscode.Range(0, 0, 5, 0); // Symbol spans multiple lines
 
     mockEditor.selection = selectionRange;
     mockEditor.document.getText.mockReturnValue('myVar');
@@ -58,7 +57,7 @@ describe('calculateRanges logic', () => {
     symbolsMap.set('myVar', [
       {
         selectionRange,
-        range: symbolRange,
+        range: symbolDeclarationRange,
       },
     ]);
     mockSymbolManager.loadSymbolMap.mockResolvedValue(symbolsMap);
@@ -85,7 +84,7 @@ describe('calculateRanges logic', () => {
   it('should use intersection symbol when highlights cover symbol definition (Case 2)', async () => {
     const selectionRange = new vscode.Range(3, 5, 3, 10);
     const symbolSelectionRange = new vscode.Range(1, 5, 1, 10);
-    const symbolRange = new vscode.Range(0, 0, 5, 0);
+    const symbolDeclarationRange = new vscode.Range(0, 0, 5, 0);
 
     mockEditor.selection = selectionRange;
     mockEditor.document.getText.mockReturnValue('myVar');
@@ -94,7 +93,7 @@ describe('calculateRanges logic', () => {
     symbolsMap.set('myVar', [
       {
         selectionRange: symbolSelectionRange,
-        range: symbolRange,
+        range: symbolDeclarationRange,
       },
     ]);
     mockSymbolManager.loadSymbolMap.mockResolvedValue(symbolsMap);

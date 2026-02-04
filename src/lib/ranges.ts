@@ -1,4 +1,4 @@
-import { Range, TextEditor, DocumentHighlight } from 'vscode';
+import { Range, TextEditor } from 'vscode';
 
 /**
  * Get line numbers by ranges

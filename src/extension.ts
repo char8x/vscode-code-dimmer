@@ -1,13 +1,11 @@
 import * as vscode from 'vscode';
 import { SymbolStore } from './lib/storage.js';
 import { SymbolManager } from './lib/symbols.js';
-import { getLinesByRanges, getNonSelectedRanges } from './lib/ranges.js';
-import { isVariableSelection, getReadOrWriteHighlights } from './lib/editor.js';
 import {
   loadSettings,
   subscribeSelectionHighlightBorderChange,
 } from './lib/config.js';
-import { calculateRanges } from './lib/logic.js';
+import { SelectionHandler } from './lib/selectionHandler.js';
 
 export async function activate(context: vscode.ExtensionContext) {
   const symbolStore = new SymbolStore(context);
@@ -25,6 +23,12 @@ export async function activate(context: vscode.ExtensionContext) {
         e.affectsConfiguration('codeFader.enabled') ||
         e.affectsConfiguration('codeFader.autoUnfold')
       ) {
+        // Clear old decorations before disposal
+        if (vscode.window.activeTextEditor) {
+          vscode.window.activeTextEditor.setDecorations(codeDecoration, []);
+        }
+        codeDecoration.dispose();
+
         const settings = loadSettings();
         isEnabled = settings.isEnabled;
         codeDecoration = settings.codeDecoration;
@@ -33,51 +37,17 @@ export async function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  let selectionVersion = 0;
+  const selectionHandler = new SelectionHandler(symbolManager, () => ({
+    isEnabled: isEnabled ?? true,
+    codeDecoration,
+    isAutoUnfold: isAutoUnfold ?? true,
+  }));
 
-  vscode.window.onDidChangeTextEditorSelection(async (event) => {
-    if (!isEnabled) {
-      event.textEditor.setDecorations(codeDecoration, []);
-      return;
-    }
+  const disposable = vscode.window.onDidChangeTextEditorSelection((event) =>
+    selectionHandler.handleSelectionChange(event)
+  );
 
-    // Respond only to mouse selection events, ignoring keyboard selection
-    if (event.kind !== vscode.TextEditorSelectionChangeKind.Mouse) {
-      if (event.selections.length === 1 && event.selections[0].isEmpty) {
-        // When the selection area becomes empty (which usually happens when pressing Esc to cancel multiple selections or deselecting items)
-        event.textEditor.setDecorations(codeDecoration, []);
-      }
-      return;
-    }
-
-    if (!isVariableSelection(event.textEditor)) {
-      event.textEditor.setDecorations(codeDecoration, []);
-      return;
-    }
-
-    const newVersion = ++selectionVersion;
-    const editor = event.textEditor;
-    const { nonSelectedRanges, selectedLines } = await calculateRanges(
-      symbolManager,
-      editor
-    );
-
-    if (newVersion !== selectionVersion) {
-      return;
-    }
-
-    editor.setDecorations(codeDecoration, nonSelectedRanges);
-
-    if (isAutoUnfold && selectedLines.length > 0) {
-      for (const line of selectedLines) {
-        await vscode.commands.executeCommand('editor.unfold', {
-          levels: 1,
-          direction: 'up',
-          selectionLines: line,
-        });
-      }
-    }
-  });
+  context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}

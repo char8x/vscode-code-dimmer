@@ -13,9 +13,15 @@ async function main() {
 
     // Download VS Code, unzip it and run the integration test
     await runTests({
+      version: '1.90.2',
       extensionDevelopmentPath,
       extensionTestsPath,
-      launchArgs: ['--disable-extensions'],
+      launchArgs: [
+        '--disable-extensions',
+        '--disable-telemetry',
+        '--disable-updates',
+        '--disable-crash-reporter',
+      ],
     });
   } catch (err) {
     console.error(err);
