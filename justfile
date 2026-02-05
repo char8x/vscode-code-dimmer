@@ -12,10 +12,10 @@ test-unit file='' name='' timeout='0':
 
 prepare version:
   git checkout -b "release/v{{version}}"
-  echo "Updating package.json to {{v}}..."
-  jq ".version = \"{{v}}\"" package.json > package.json.tmp && mv package.json.tmp package.json
+  echo "Updating package.json to {{version}}..."
+  jq ".version = \"{{version}}\"" package.json > package.json.tmp && mv package.json.tmp package.json
   git add package.json
-  git commit -m "chore: bump version to {{v}}"
+  git commit -m "chore: bump version to {{version}}"
   git push origin "release/v{{version}}"
 
 release version:
