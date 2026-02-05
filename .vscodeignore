@@ -20,3 +20,4 @@ test-fixture/**
 justfile
 .npmrc
 *.vsix
+vitest.config.mts
