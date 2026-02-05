@@ -19,9 +19,9 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (
-        e.affectsConfiguration('codeFader.decoration') ||
-        e.affectsConfiguration('codeFader.enabled') ||
-        e.affectsConfiguration('codeFader.autoUnfold')
+        e.affectsConfiguration('codeDimmer.decoration') ||
+        e.affectsConfiguration('codeDimmer.enabled') ||
+        e.affectsConfiguration('codeDimmer.autoUnfold')
       ) {
         // Clear old decorations before disposal
         if (vscode.window.activeTextEditor) {

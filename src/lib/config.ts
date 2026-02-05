@@ -17,14 +17,14 @@ export function loadSettings(): Settings {
       opacity: '0.2',
       backgroundColor: 'transparent',
     } as vscode.ThemableDecorationRenderOptions,
-    config.get<vscode.ThemableDecorationRenderOptions>('codeFader.decoration')
+    config.get<vscode.ThemableDecorationRenderOptions>('codeDimmer.decoration')
   );
 
   const codeDecoration =
     vscode.window.createTextEditorDecorationType(decorationSetting);
 
-  const isEnabled = config.get<boolean>('codeFader.enabled');
-  const isAutoUnfold = config.get<boolean>('codeFader.autoUnfold');
+  const isEnabled = config.get<boolean>('codeDimmer.enabled');
+  const isAutoUnfold = config.get<boolean>('codeDimmer.autoUnfold');
 
   return { isEnabled, codeDecoration, isAutoUnfold };
 }
@@ -57,7 +57,7 @@ export function subscribeSelectionHighlightBorderChange(
   // Listen for Configuration Change Events
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration('codeFader.enabled')) {
+      if (event.affectsConfiguration('codeDimmer.enabled')) {
         showReloadPrompt();
       }
     })

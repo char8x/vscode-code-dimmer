@@ -32,12 +32,12 @@
       "title": "Code Dimmer",
       "type": "object",
       "properties": {
-        "codeFader.enabled": {
+        "codeDimmer.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable Code Dimmer"
         },
-        "codeFader.decoration": {
+        "codeDimmer.decoration": {
           "type": "object",
           "description": "Rendering styles for irrelevant code",
           "default": {
@@ -45,7 +45,7 @@
             "backgroundColor": "transparent"
           }
         },
-        "codeFader.autoUnfold": {
+        "codeDimmer.autoUnfold": {
           "type": "boolean",
           "description": "Auto unfold code block",
           "default": true
